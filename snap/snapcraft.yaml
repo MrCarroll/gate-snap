@@ -25,6 +25,9 @@ grade: stable
 confinement: strict
 license: LGPL-3.0
 compression: lzo
+assumes: 
+  - snap-env
+  - command-chain
 
 parts:
   gate:
