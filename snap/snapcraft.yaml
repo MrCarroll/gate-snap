@@ -161,7 +161,6 @@ environment:
 
 plugs:
   home:
-  network:
   opengl:
   x11:
   wayland:
