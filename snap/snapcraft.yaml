@@ -33,7 +33,7 @@ parts:
   gate:
     plugin: cmake
     source: https://github.com/OpenGATE/gate.git
-    source-tag: "v9.1"
+    source-commit: 86083caae3a4f41903b3d1e3c3d5571e807e041e # 9.1
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=14
       - -DGATE_USE_GEANT4_UIVIS=ON
@@ -55,11 +55,12 @@ parts:
   libtorch:
     plugin: dump
     source: https://download.pytorch.org/libtorch/lts/1.8/cpu/libtorch-cxx11-abi-shared-with-deps-1.8.2%2Bcpu.zip
+    source-checksum: sha256/B76D6DD4380E2233CE6F7654E672E13AAE7C871231D223A4267EF018DCBFB616
 
   libitk:
     plugin: cmake
     source: https://github.com/InsightSoftwareConsortium/ITK.git
-    source-tag: v5.2.1
+    source-commit: 8be208ee1f04d09912523401e78ba7bb14a89d6f # 5.2.1
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=14
       - -DMODULE_RTK=ON
@@ -74,6 +75,7 @@ parts:
   geant4:
     plugin: cmake
     source: https://geant4-data.web.cern.ch/releases/geant4.10.07.p02.tar.gz
+    source-checksum: sha256/EE4AE9F103546E92AA3762B253FD1D95D1F2792299951D59C94E7B673EB86B32
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=14
       - -DGEANT4_INSTALL_DATA=ON
@@ -116,7 +118,7 @@ parts:
   root:
     plugin: cmake
     source: https://github.com/root-project/root.git
-    source-tag: "v6-24-06"
+    source-commit: 3b796f86a30e274053669931a24d77a3d36c8f18 # 6-24-06
     cmake-parameters: 
       - -DCMAKE_CXX_STANDARD=14
     build-packages:
