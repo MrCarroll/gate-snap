@@ -2,8 +2,7 @@
 Name=Gate
 Comment="A toolkit for numerical simulations in medical imaging and radiotherapy"
 Exec=gate --qt
-Icon=${SNAP}/meta/gui/GATE.png
+Icon=${SNAP}/meta/gui/gate.png
 Type=Application
 Terminal=true
 Categories=Science;
-NoDisplay=true
