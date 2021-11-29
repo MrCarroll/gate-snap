@@ -55,7 +55,7 @@ parts:
   libtorch:
     plugin: dump
     source: https://download.pytorch.org/libtorch/lts/1.8/cpu/libtorch-cxx11-abi-shared-with-deps-1.8.2%2Bcpu.zip
-    source-checksum: sha256/B76D6DD4380E2233CE6F7654E672E13AAE7C871231D223A4267EF018DCBFB616
+    source-checksum: sha256/b76d6dd4380e2233ce6f7654e672e13aae7c871231d223a4267ef018dcbfb616
 
   libitk:
     plugin: cmake
@@ -75,7 +75,7 @@ parts:
   geant4:
     plugin: cmake
     source: https://geant4-data.web.cern.ch/releases/geant4.10.07.p02.tar.gz
-    source-checksum: sha256/EE4AE9F103546E92AA3762B253FD1D95D1F2792299951D59C94E7B673EB86B32
+    source-checksum: sha256/ee4ae9f103546e92aa3762b253fd1d95d1f2792299951d59c94e7b673eb86b32
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=14
       - -DGEANT4_INSTALL_DATA=ON
