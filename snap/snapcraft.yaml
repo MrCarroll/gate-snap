@@ -11,6 +11,9 @@ description: |
 
   This snap contains Gate bundled with Geant4 (with QT, and all optional Geant4 datasets), ROOT, and PyTorch.
   Simply run `Gate` or `Gate --qt` on the command line to begin using it.
+  
+  Jobsplitter tools can be accessed via `gate.gjs` and `gate.gjm` 
+  The split macro files will be placed in `$HOME/snap/common/.gate`
 
   Snaps are sandboxed applications designed to be portable and run across a wide variety of Linux systems.
   Due to the sandboxing, please ensure all your work is contained within your `$HOME` folder to be accessible.
@@ -51,7 +54,37 @@ parts:
       - libglu1-mesa
       # QT is optional, and included with the geant4 part
     after: [libtorch, libitk, geant4, root]
-
+    
+  jobsplitter:
+    plugin: make
+    source: https://github.com/OpenGATE/gate.git
+    source-commit: 86083caae3a4f41903b3d1e3c3d5571e807e041e # 9.1
+    source-subdir: cluster_tools/jobsplitter
+    build-environment: 
+      - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
+      - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib
+    override-pull: |
+      snapcraftctl pull
+      sed -i 's!/usr/local/bin!$(DESTDIR)!g' $SNAPCRAFT_PART_SRC/cluster_tools/jobsplitter/Makefile
+    organize: 
+      gjs: usr/local/bin/gjs
+    after: [gate]
+    
+  filemerger:
+    plugin: make
+    source: https://github.com/OpenGATE/gate.git
+    source-commit: 86083caae3a4f41903b3d1e3c3d5571e807e041e # 9.1
+    source-subdir: cluster_tools/filemerger
+    build-environment: 
+      - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
+      - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib
+    override-pull: |
+      snapcraftctl pull
+      sed -i 's!/usr/local/bin!$(DESTDIR)!g' $SNAPCRAFT_PART_SRC/cluster_tools/filemerger/Makefile
+    organize:
+      gjm: usr/local/bin/gjm
+    after: [gate]
+    
   libtorch:
     plugin: dump
     source: https://download.pytorch.org/libtorch/lts/1.8/cpu/libtorch-cxx11-abi-shared-with-deps-1.8.2%2Bcpu.zip
@@ -162,6 +195,8 @@ environment:
   G4LEVELGAMMADATA: $SNAP/usr/local/share/Geant4-10.7.2/data/PhotonEvaporation5.7
   G4RADIOACTIVEDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/RadioactiveDecay5.6
   G4REALSURFACEDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/RealSurface2.2
+  GC_DOT_GATE_DIR: ${SNAP_USER_COMMON}
+  GC_GATE_EXE_DIR: ${SNAP}/usr/local/bin
   LC_NUMERIC: C
 
 plugs:
@@ -192,6 +227,14 @@ plugs:
 apps:
   gate:
     command: usr/local/bin/Gate
+    command-chain: 
+      - bin/setup-sandbox.sh
+  gjs:
+    command: usr/local/bin/gjs
+    command-chain: 
+      - bin/setup-sandbox.sh
+  gjm:
+    command: usr/local/bin/gjm
     command-chain: 
       - bin/setup-sandbox.sh
 
