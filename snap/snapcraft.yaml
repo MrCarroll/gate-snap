@@ -1,6 +1,6 @@
 name: gate
 base: core20
-version: '9.1'
+version: '9.2'
 summary: A toolkit for numerical simulations in medical imaging and radiotherapy
 description: |
   http://www.opengatecollaboration.org
@@ -9,7 +9,7 @@ description: |
   Using an easy-to-learn macro mechanism to configurate simple or highly sophisticated experimental settings, GATE now plays a key role in the design of new medical imaging devices, in the optimization of acquisition protocols and in the development and assessment of image reconstruction algorithms and correction techniques.
   It can also be used for dose calculation in radiation therapy, brachytherapy or any other application.
 
-  This snap contains Gate bundled with Geant4 (with QT, and all optional Geant4 datasets), ROOT, and PyTorch.
+  This snap contains Gate bundled with Geant4 (with QT, and all optional Geant4 datasets) and ROOT.
   Simply run `Gate` or `Gate --qt` on the command line to begin using it.
   
   Jobsplitter tools can be accessed via `gate.gjs` and `gate.gjm` 
@@ -36,29 +36,28 @@ parts:
   gate:
     plugin: cmake
     source: https://github.com/OpenGATE/gate.git
-    source-commit: 86083caae3a4f41903b3d1e3c3d5571e807e041e # 9.1
+    source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
     cmake-parameters:
-      - -DCMAKE_CXX_STANDARD=14
+      - -DCMAKE_CXX_STANDARD=17
       - -DGATE_USE_GEANT4_UIVIS=ON
-      - -DGATE_USE_TORCH=ON
+      - -DGATE_USE_TORCH=OFF
       - -DGATE_USE_OPTICAL=ON
       - -DGATE_USE_DAVIS=ON
       - -DGATE_USE_LMF=OFF
     build-environment:
-      - Geant4_DIR: $SNAPCRAFT_STAGE/usr/local/lib/Geant4-10.7.2
+      - Geant4_DIR: $SNAPCRAFT_STAGE/usr/local/lib/Geant4-11.0.1
       - ROOT_DIR: $SNAPCRAFT_STAGE/usr/local/cmake
       - ROOTSYS: $SNAPCRAFT_STAGE/usr/local
-      - Torch_DIR: $SNAPCRAFT_STAGE/libtorch/share/cmake
       - ITK_DIR: $SNAPCRAFT_STAGE/usr/local/lib/cmake
     stage-packages:
       - libglu1-mesa
       # QT is optional, and included with the geant4 part
-    after: [libtorch, libitk, geant4, root]
+    after: [libitk, geant4, root]
     
   jobsplitter:
     plugin: make
     source: https://github.com/OpenGATE/gate.git
-    source-commit: 86083caae3a4f41903b3d1e3c3d5571e807e041e # 9.1
+    source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
     source-subdir: cluster_tools/jobsplitter
     build-environment: 
       - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
@@ -73,7 +72,7 @@ parts:
   filemerger:
     plugin: make
     source: https://github.com/OpenGATE/gate.git
-    source-commit: 86083caae3a4f41903b3d1e3c3d5571e807e041e # 9.1
+    source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
     source-subdir: cluster_tools/filemerger
     build-environment: 
       - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
@@ -85,17 +84,12 @@ parts:
       gjm: usr/local/bin/gjm
     after: [gate]
     
-  libtorch:
-    plugin: dump
-    source: https://download.pytorch.org/libtorch/lts/1.8/cpu/libtorch-cxx11-abi-shared-with-deps-1.8.2%2Bcpu.zip
-    source-checksum: sha256/b76d6dd4380e2233ce6f7654e672e13aae7c871231d223a4267ef018dcbfb616
-
   libitk:
     plugin: cmake
     source: https://github.com/InsightSoftwareConsortium/ITK.git
     source-commit: 8be208ee1f04d09912523401e78ba7bb14a89d6f # 5.2.1
     cmake-parameters:
-      - -DCMAKE_CXX_STANDARD=14
+      - -DCMAKE_CXX_STANDARD=17
       - -DMODULE_RTK=ON
       - -DBUILD_EXAMPLES=OFF
       - -DBUILD_TESTING=OFF
@@ -107,10 +101,10 @@ parts:
 
   geant4:
     plugin: cmake
-    source: https://geant4-data.web.cern.ch/releases/geant4.10.07.p02.tar.gz
-    source-checksum: sha256/ee4ae9f103546e92aa3762b253fd1d95d1f2792299951d59c94e7b673eb86b32
+    source: https://geant4-data.web.cern.ch/releases/geant4-v11.0.1.tar.gz # V11.0
+    source-checksum: sha256/3e9b0e68b006c1ddd8c5f6ded084fcd8029a568ecd0e45026d7ef818df46a02b
     cmake-parameters:
-      - -DCMAKE_CXX_STANDARD=14
+      - -DCMAKE_CXX_STANDARD=17
       - -DGEANT4_INSTALL_DATA=ON
       - -DGEANT4_BUILD_MULTITHREADED=OFF
       - -DGEANT4_USE_QT=ON
@@ -151,9 +145,9 @@ parts:
   root:
     plugin: cmake
     source: https://github.com/root-project/root.git
-    source-commit: 3b796f86a30e274053669931a24d77a3d36c8f18 # 6-24-06
+    source-commit: 54a757ac45e84b2ffbc5d0bcbdfa11fa58b6d8ee # 6-26-00
     cmake-parameters: 
-      - -DCMAKE_CXX_STANDARD=14
+      - -DCMAKE_CXX_STANDARD=17
     build-packages:
       - libx11-dev 
       - libxpm-dev
@@ -184,17 +178,17 @@ environment:
   LD_LIBRARY_PATH: ${SNAP}/usr/local/lib:${SNAP}/libtorch/lib
   CLING_STANDARD_PCH: none
   XAUTHORITY: ${SNAP_REAL_HOME}/.Xauthority
-  G4ABLADATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4ABLA3.1
-  G4LEDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4EMLOW7.13
-  G4ENSDFSTATEDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4ENSDFSTATE2.3
-  G4INCLDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4INCL1.0
-  G4PARTICLEXSDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4PARTICLEXS3.1.1
-  G4PIIDATA: $SNAP/usr/local/share/Geant4-10.07.2/data/G4PII1.3
-  G4SAIDXSDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4SAIDDATA2.0
-  G4NEUTRONHPDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/G4NDL4.6
-  G4LEVELGAMMADATA: $SNAP/usr/local/share/Geant4-10.7.2/data/PhotonEvaporation5.7
-  G4RADIOACTIVEDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/RadioactiveDecay5.6
-  G4REALSURFACEDATA: $SNAP/usr/local/share/Geant4-10.7.2/data/RealSurface2.2
+  G4ABLADATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4ABLA3.1
+  G4LEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4EMLOW8.0
+  G4ENSDFSTATEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4ENSDFSTATE2.3
+  G4INCLDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4INCL1.0
+  G4NEUTRONHPDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4NDL4.6
+  G4PARTICLEXSDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4PARTICLEXS4.0
+  G4PIIDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4PII1.3
+  G4SAIDXSDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4SAIDDATA2.0
+  G4LEVELGAMMADATA: $SNAP/usr/local/share/Geant4-11.0.1/data/PhotonEvaporation5.7
+  G4RADIOACTIVEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/RadioactiveDecay5.6
+  G4REALSURFACEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/RealSurface2.2
   GC_DOT_GATE_DIR: ${SNAP_USER_COMMON}
   GC_GATE_EXE_DIR: ${SNAP}/usr/local/bin
   LC_NUMERIC: C
