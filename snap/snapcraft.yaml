@@ -51,7 +51,7 @@ parts:
       - ITK_DIR: $SNAPCRAFT_STAGE/usr/local/lib/cmake
     stage-packages:
       - libglu1-mesa
-      # QT is optional, and included with the geant4 part
+# QT is optional, and included with the geant4 part
     after: [libitk, geant4, root]
     
   jobsplitter:
@@ -117,7 +117,7 @@ parts:
       - libmotif-dev
       - libx11-dev
     stage-packages:
-      # QT (Desktop Helpers)
+# QT (Desktop Helpers)
       - libxkbcommon0
       - ttf-ubuntu-font-family
       - dmz-cursor-theme
@@ -129,7 +129,7 @@ parts:
       - libgdk-pixbuf2.0-0
       - libqt5svg5
       - locales-all
-      # QT (Snapcraft statically resolved dependencies)
+# QT (Snapcraft statically resolved dependencies)
       - libdouble-conversion3
       - libfreetype6
       - libgraphite2-3
@@ -139,7 +139,7 @@ parts:
       - libqt5core5a
       - libqt5opengl5
       - libqt5widgets5
-      # The rest
+# The rest
       - libglu1-mesa
 
   root:
