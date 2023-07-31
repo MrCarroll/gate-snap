@@ -1,6 +1,6 @@
 name: gate
-base: core20
-version: '9.2'
+base: core22
+version: '9.3'
 summary: A toolkit for numerical simulations in medical imaging and radiotherapy
 description: |
   http://www.opengatecollaboration.org
@@ -36,7 +36,7 @@ parts:
   gate:
     plugin: cmake
     source: https://github.com/OpenGATE/gate.git
-    source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
+    source-commit: a46f46dee111ac5f2c5c3ea7ab85dd202f94ecb7 # 9.3
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=17
       - -DGATE_USE_GEANT4_UIVIS=ON
@@ -45,26 +45,30 @@ parts:
       - -DGATE_USE_DAVIS=ON
       - -DGATE_USE_LMF=OFF
     build-environment:
-      - Geant4_DIR: $SNAPCRAFT_STAGE/usr/local/lib/Geant4-11.0.1
-      - ROOT_DIR: $SNAPCRAFT_STAGE/usr/local/cmake
-      - ROOTSYS: $SNAPCRAFT_STAGE/usr/local
-      - ITK_DIR: $SNAPCRAFT_STAGE/usr/local/lib/cmake
+      - Geant4_DIR: $CRAFT_STAGE/usr/local/lib/cmake/Geant4
+      - ROOT_DIR: $CRAFT_STAGE/usr/local/cmake
+      - ROOTSYS: $CRAFT_STAGE/usr/local
+      - ITK_DIR: $CRAFT_STAGE/usr/local/lib/cmake
+    build-packages:
+      - build-essential
     stage-packages:
       - libglu1-mesa
-# QT is optional, and included with the geant4 part
+      # QT is optional, and included with the geant4 part
     after: [libitk, geant4, root]
 
   jobsplitter:
     plugin: make
     source: https://github.com/OpenGATE/gate.git
-    source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
+    source-commit: a46f46dee111ac5f2c5c3ea7ab85dd202f94ecb7 # 9.3
     source-subdir: cluster_tools/jobsplitter
     build-environment:
-      - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
-      - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib
+      - PATH: $CRAFT_STAGE/usr/local/bin:$PATH
+      - LD_LIBRARY_PATH: $CRAFT_STAGE/usr/local/lib
+    build-packages:
+      - build-essential
     override-pull: |
-      snapcraftctl pull
-      sed -i 's!/usr/local/bin!$(DESTDIR)!g' $SNAPCRAFT_PART_SRC/cluster_tools/jobsplitter/Makefile
+      craftctl default
+      sed -i 's!/usr/local/bin!$(DESTDIR)!g' $CRAFT_PART_SRC/cluster_tools/jobsplitter/Makefile
     organize:
       gjs: usr/local/bin/gjs
     after: [gate]
@@ -72,14 +76,16 @@ parts:
   filemerger:
     plugin: make
     source: https://github.com/OpenGATE/gate.git
-    source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
+    source-commit: a46f46dee111ac5f2c5c3ea7ab85dd202f94ecb7 # 9.3
     source-subdir: cluster_tools/filemerger
     build-environment:
-      - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
-      - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib
+      - PATH: $CRAFT_STAGE/usr/local/bin:$PATH
+      - LD_LIBRARY_PATH: $CRAFT_STAGE/usr/local/lib
+    build-packages:
+      - build-essential
     override-pull: |
-      snapcraftctl pull
-      sed -i 's!/usr/local/bin!$(DESTDIR)!g' $SNAPCRAFT_PART_SRC/cluster_tools/filemerger/Makefile
+      craftctl default
+      sed -i 's!/usr/local/bin!$(DESTDIR)!g' $CRAFT_PART_SRC/cluster_tools/filemerger/Makefile
     organize:
       gjm: usr/local/bin/gjm
     after: [gate]
@@ -87,7 +93,7 @@ parts:
   libitk:
     plugin: cmake
     source: https://github.com/InsightSoftwareConsortium/ITK.git
-    source-commit: 8be208ee1f04d09912523401e78ba7bb14a89d6f # 5.2.1
+    source-commit: 8be208ee1f04d09912523401e78ba7bb14a89d6f # 5.2.1 - avoiding 5.2.0 due to compilation bugs
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=17
       - -DMODULE_RTK=ON
@@ -97,12 +103,13 @@ parts:
       - -DITK_BUILD_DEFAULT_MODULES=ON
       - -DITK_WRAP_PYTHON=OFF
     build-packages:
+      - build-essential
       - libxml2-dev
 
   geant4:
     plugin: cmake
-    source: https://geant4-data.web.cern.ch/releases/geant4-v11.0.1.tar.gz # V11.0
-    source-checksum: sha256/3e9b0e68b006c1ddd8c5f6ded084fcd8029a568ecd0e45026d7ef818df46a02b
+    source: https://gitlab.cern.ch/geant4/geant4/-/archive/v11.1.0/geant4-v11.1.0.tar.gz # V11.0
+    source-checksum: sha256/c4a23f2f502efeab56de43a4412b21f65c7ca1b0877b9bc1d7e845ee12edf70a
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=17
       - -DGEANT4_INSTALL_DATA=ON
@@ -110,6 +117,7 @@ parts:
       - -DGEANT4_USE_QT=ON
       - -DGEANT4_USE_RAYTRACER_X11=ON
     build-packages:
+      - build-essential
       - qtbase5-dev
       - libqt5opengl5-dev
       - libexpat1-dev
@@ -117,9 +125,8 @@ parts:
       - libmotif-dev
       - libx11-dev
     stage-packages:
-# QT (Desktop Helpers)
+      # QT (Desktop Helpers)
       - libxkbcommon0
-      - ttf-ubuntu-font-family
       - dmz-cursor-theme
       - light-themes
       - adwaita-icon-theme
@@ -129,40 +136,41 @@ parts:
       - libgdk-pixbuf2.0-0
       - libqt5svg5
       - locales-all
-# QT (Snapcraft statically resolved dependencies)
+      # QT (Snapcraft statically resolved dependencies)
       - libdouble-conversion3
       - libfreetype6
       - libgraphite2-3
       - libharfbuzz0b
-      - libpcre2-16-0
+      - libpcre2-32-0
       - libpng16-16
       - libqt5core5a
       - libqt5opengl5
       - libqt5widgets5
-# The rest
+      # The rest
       - libglu1-mesa
 
   root:
     plugin: cmake
     source: https://github.com/root-project/root.git
-    source-commit: 54807d9b7051c0e88d7074c9d2205bbd884e0210 #v6.26.2
+    source-commit: e8464159f683e1f2843bce86d6aeac5152075451 #v6.24.06
     cmake-parameters:
       - -DCMAKE_CXX_STANDARD=17
+      - -Dxrootd=OFF
+      - -Dbuiltin_xrootd=OFF
     build-packages:
+      - build-essential
       - libx11-dev
       - libxpm-dev
       - libxft-dev
       - libxext-dev
       - libssl-dev
+      - libpcre++-dev
     stage-packages:
-      - libstdc++-9-dev
+      - libstdc++-11-dev
       - libc6-dev
       - libglu1-mesa
       - libxft2
       - libxpm4
-    override-pull: |
-      snapcraftctl pull
-      git cherry-pick 8c22e4b9985246fa8ea39fdac0c33822c865c2c3 # XROOTD hash mismatch
 
   extras:
     plugin: dump
@@ -170,28 +178,24 @@ parts:
     source-type: local
 
 layout:
-  /usr/share/libdrm:
-    symlink: $SNAP/usr/share/libdrm
   /usr/include:
     bind: $SNAP/usr/include
 
 environment:
-  ROOTSYS: ${SNAP}/usr/local
-  PATH: ${SNAP}/usr/local/bin:${PATH}
-  LD_LIBRARY_PATH: ${SNAP}/usr/local/lib
-  CLING_STANDARD_PCH: none
+  # Don't forget setup-sandbox.sh
+  DISABLE_WAYLAND: 1
   XAUTHORITY: ${SNAP_REAL_HOME}/.Xauthority
-  G4ABLADATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4ABLA3.1
-  G4LEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4EMLOW8.0
-  G4ENSDFSTATEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4ENSDFSTATE2.3
-  G4INCLDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4INCL1.0
-  G4NEUTRONHPDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4NDL4.6
-  G4PARTICLEXSDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4PARTICLEXS4.0
-  G4PIIDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4PII1.3
-  G4SAIDXSDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/G4SAIDDATA2.0
-  G4LEVELGAMMADATA: $SNAP/usr/local/share/Geant4-11.0.1/data/PhotonEvaporation5.7
-  G4RADIOACTIVEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/RadioactiveDecay5.6
-  G4REALSURFACEDATA: $SNAP/usr/local/share/Geant4-11.0.1/data/RealSurface2.2
+  G4ABLADATA: $SNAP/usr/local/share/Geant4/data/G4ABLA3.1
+  G4LEDATA: $SNAP/usr/local/share/Geant4/data/G4EMLOW8.2
+  G4ENSDFSTATEDATA: $SNAP/usr/local/share/Geant4/data/G4ENSDFSTATE2.3
+  G4INCLDATA: $SNAP/usr/local/share/Geant4/data/G4INCL1.0
+  G4NEUTRONHPDATA: $SNAP/usr/local/share/Geant4/data/G4NDL4.7
+  G4PARTICLEXSDATA: $SNAP/usr/local/share/Geant4/data/G4PARTICLEXS4.0
+  G4PIIDATA: $SNAP/usr/local/share/Geant4/data/G4PII1.3
+  G4SAIDXSDATA: $SNAP/usr/local/share/Geant4/data/G4SAIDDATA2.0
+  G4LEVELGAMMADATA: $SNAP/usr/local/share/Geant4/data/PhotonEvaporation5.7
+  G4RADIOACTIVEDATA: $SNAP/usr/local/share/Geant4/data/RadioactiveDecay5.6
+  G4REALSURFACEDATA: $SNAP/usr/local/share/Geant4/data/RealSurface2.2
   GC_DOT_GATE_DIR: ${SNAP_USER_COMMON}
   GC_GATE_EXE_DIR: ${SNAP}/usr/local/bin
   LC_NUMERIC: C

@@ -18,6 +18,18 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
+export PATH=${SNAP}/usr/local/bin:${PATH}
+export LD_LIBRARY_PATH=${SNAP}/usr/local/lib:${LD_LIBRARY_PATH}
+export CLING_STANDARD_PCH=none
+unset old_rootsys
+unset DYLD_LIBRARY_PATH
+unset SHLIB_PATH
+unset LIBPATH
+unset MANPATH
+unset JUPYTER_PATH
+unset JUPYTER_CONFIG_DIR
+export ROOTSYS=${SNAP}/usr/local
+
 #################
 # Launcher init #
 #################
