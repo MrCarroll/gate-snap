@@ -11,8 +11,8 @@ description: |
 
   This snap contains Gate bundled with Geant4 (with QT, and all optional Geant4 datasets) and ROOT.
   Simply run `Gate` or `Gate --qt` on the command line to begin using it.
-  
-  Jobsplitter tools can be accessed via `gate.gjs` and `gate.gjm` 
+
+  Jobsplitter tools can be accessed via `gate.gjs` and `gate.gjm`
   The split macro files will be placed in `$HOME/snap/common/.gate`
 
   Snaps are sandboxed applications designed to be portable and run across a wide variety of Linux systems.
@@ -28,7 +28,7 @@ grade: stable
 confinement: strict
 license: LGPL-3.0
 compression: lzo
-assumes: 
+assumes:
   - snap-env
   - command-chain
 
@@ -53,28 +53,28 @@ parts:
       - libglu1-mesa
 # QT is optional, and included with the geant4 part
     after: [libitk, geant4, root]
-    
+
   jobsplitter:
     plugin: make
     source: https://github.com/OpenGATE/gate.git
     source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
     source-subdir: cluster_tools/jobsplitter
-    build-environment: 
+    build-environment:
       - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
       - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib
     override-pull: |
       snapcraftctl pull
       sed -i 's!/usr/local/bin!$(DESTDIR)!g' $SNAPCRAFT_PART_SRC/cluster_tools/jobsplitter/Makefile
-    organize: 
+    organize:
       gjs: usr/local/bin/gjs
     after: [gate]
-    
+
   filemerger:
     plugin: make
     source: https://github.com/OpenGATE/gate.git
     source-commit: 53738d534e1ec35a2d97f6ffd8e1214e11450017 # 9.2 + GJS patches
     source-subdir: cluster_tools/filemerger
-    build-environment: 
+    build-environment:
       - PATH: $SNAPCRAFT_STAGE/usr/local/bin:$PATH
       - LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib
     override-pull: |
@@ -83,7 +83,7 @@ parts:
     organize:
       gjm: usr/local/bin/gjm
     after: [gate]
-    
+
   libitk:
     plugin: cmake
     source: https://github.com/InsightSoftwareConsortium/ITK.git
@@ -146,13 +146,13 @@ parts:
     plugin: cmake
     source: https://github.com/root-project/root.git
     source-commit: 54807d9b7051c0e88d7074c9d2205bbd884e0210 #v6.26.2
-    cmake-parameters: 
+    cmake-parameters:
       - -DCMAKE_CXX_STANDARD=17
     build-packages:
-      - libx11-dev 
+      - libx11-dev
       - libxpm-dev
-      - libxft-dev 
-      - libxext-dev 
+      - libxft-dev
+      - libxext-dev
       - libssl-dev
     stage-packages:
       - libstdc++-9-dev
@@ -224,14 +224,13 @@ plugs:
 apps:
   gate:
     command: usr/local/bin/Gate
-    command-chain: 
+    command-chain:
       - bin/setup-sandbox.sh
   gjs:
     command: usr/local/bin/gjs
-    command-chain: 
+    command-chain:
       - bin/setup-sandbox.sh
   gjm:
     command: usr/local/bin/gjm
-    command-chain: 
+    command-chain:
       - bin/setup-sandbox.sh
-
